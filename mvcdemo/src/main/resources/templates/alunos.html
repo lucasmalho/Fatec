@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>ERROOOOO</title>
+</head>
+<body>
+<h1>Lista de Alunos</h1>
+<hr>
+<table>
+    <thead>
+        <tr>
+            <th>Esporte |</th>
+            <th> Nome |</th>
+            <th> 1° Pódio |</th>
+            <th> 2° Pódio |</th>
+        </tr>
+    </thead>
+    <tbody>
+    <tr th:each="aluno:${alunos}">
+        <td th:text="${aluno.esporte}">Esporte</td>
+        <td th:text="${aluno.nome}">Nome</td>
+        <td th:text="${aluno.podio1}">1° Pódio</td>
+        <td th:text="${aluno.podio2}">2° Pódio</td>
+    </tr>
+
+    </tbody>
+</table>
+</body>
+</html>
