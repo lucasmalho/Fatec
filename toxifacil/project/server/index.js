@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
-import nodemailer from 'nodemailer';
 import dotenv from 'dotenv';
+import nodemailer from 'nodemailer';
 
 dotenv.config();
 
@@ -10,7 +10,7 @@ const app = express();
 // Configuração do CORS para permitir requisições do frontend
 app.use(cors({
   origin: [
-    'http://localhost:5173', 
+    'http://localhost:5173',
     'https://spiffy-cascaron-7f16eb.netlify.app'
   ],
   methods: ['POST'],
@@ -19,21 +19,14 @@ app.use(cors({
 
 app.use(express.json());
 
-// Configuração do transporter do Nodemailer
+// Configurar o transporter do Nodemailer
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  host: process.env.EMAIL_HOST,
+  port: process.env.EMAIL_PORT,
+  secure: true,
   auth: {
     user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
-  }
-});
-
-// Verificar a conexão com o servidor SMTP
-transporter.verify(function(error, success) {
-  if (error) {
-    console.log('Erro na configuração do servidor SMTP:', error);
-  } else {
-    console.log('Servidor pronto para enviar emails');
+    pass: process.env.EMAIL_PASSWORD
   }
 });
 
@@ -41,21 +34,14 @@ app.post('/api/contact', async (req, res) => {
   const { name, email, phone, message } = req.body;
 
   try {
-    // Validar os dados recebidos
     if (!name || !email || !phone || !message) {
       return res.status(400).json({ error: 'Todos os campos são obrigatórios' });
     }
 
     const mailOptions = {
-      from: process.env.EMAIL_USER,
-      to: 'tcc@malho.com.br',
+      from: process.env.EMAIL_SENDER,
+      to: process.env.EMAIL_RECIPIENT,
       subject: 'Nova mensagem de contato - ToxiFácil',
-      text: `
-        Nome: ${name}
-        Email: ${email}
-        Telefone: ${phone}
-        Mensagem: ${message}
-      `,
       html: `
         <h2>Nova mensagem de contato - ToxiFácil</h2>
         <p><strong>Nome:</strong> ${name}</p>
@@ -67,10 +53,10 @@ app.post('/api/contact', async (req, res) => {
     };
 
     await transporter.sendMail(mailOptions);
-    res.status(200).json({ message: 'Email enviado com sucesso!' });
+    res.json({ success: true });
   } catch (error) {
-    console.error('Erro ao enviar email:', error);
-    res.status(500).json({ error: 'Erro ao enviar email: ' + error.message });
+    console.error('Erro ao processar contato:', error);
+    res.status(500).json({ error: 'Erro ao processar sua mensagem' });
   }
 });
 

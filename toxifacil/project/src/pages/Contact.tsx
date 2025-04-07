@@ -37,41 +37,12 @@ export function Contact() {
     setErrorMessage('');
 
     try {
-      const apiKey = import.meta.env.VITE_BREVO_API_KEY;
-      if (!apiKey) {
-        throw new Error('API key não configurada');
-      }
-
-      const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+      const response = await fetch('/api/contact', {
         method: 'POST',
         headers: {
-          'Accept': 'application/json',
           'Content-Type': 'application/json',
-          'api-key': apiKey
         },
-        body: JSON.stringify({
-          sender: {
-            name: 'ToxiFácil',
-            email: 'noreply@toxifacil.com.br'
-          },
-          to: [{
-            email: 'tcc@malho.com.br',
-            name: 'ToxiFácil'
-          }],
-          replyTo: {
-            email: formData.email,
-            name: formData.name
-          },
-          subject: 'Nova mensagem de contato - ToxiFácil',
-          htmlContent: `
-            <h2>Nova mensagem de contato - ToxiFácil</h2>
-            <p><strong>Nome:</strong> ${formData.name}</p>
-            <p><strong>Email:</strong> ${formData.email}</p>
-            <p><strong>Telefone:</strong> ${formData.phone}</p>
-            <p><strong>Mensagem:</strong></p>
-            <p>${formData.message}</p>
-          `
-        })
+        body: JSON.stringify(formData)
       });
 
       const data = await response.json();

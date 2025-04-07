@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { MapPin, Search, Loader2, Phone, Clock, Navigation } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import { consultarCEP } from '../services/cep';
 import { buscarLaboratorios } from '../services/laboratorios';
-import { Agendamento } from '../pages/Agendamento';
 
 interface EnderecoState {
   bairro: string;
@@ -29,7 +30,8 @@ export function LabSearch() {
   const [isLoading, setIsLoading] = useState(false);
   const [laboratorios, setLaboratorios] = useState<Laboratorio[]>([]);
   const [buscandoLabs, setBuscandoLabs] = useState(false);
-  const [labSelecionado, setLabSelecionado] = useState<string | null>(null);
+  const navigate = useNavigate();
+  const { user } = useAuth();
 
   const formatarCEP = (valor: string) => {
     const cepLimpo = valor.replace(/\D/g, '');
@@ -46,7 +48,6 @@ export function LabSearch() {
     if (endereco) {
       setEndereco(null);
       setLaboratorios([]);
-      setLabSelecionado(null);
     }
   };
 
@@ -55,7 +56,6 @@ export function LabSearch() {
     setError(null);
     setEndereco(null);
     setLaboratorios([]);
-    setLabSelecionado(null);
     
     if (cep.length < 8) {
       setError('Digite um CEP válido');
@@ -90,27 +90,28 @@ export function LabSearch() {
     }
   };
 
-  const agendarExame = (labId: string) => {
-    setLabSelecionado(labId);
-  };
-
-  if (labSelecionado) {
-    const lab = laboratorios.find(l => l.id === labSelecionado);
-    if (lab) {
-      return (
-        <Agendamento
-          laboratorioId={lab.id}
-          laboratorio={{
-            nome: lab.nome,
-            endereco: lab.endereco,
-            bairro: lab.bairro,
-            cidade: lab.cidade,
-            uf: lab.uf
-          }}
-        />
-      );
+  const handleLabSelection = (labId: string) => {
+    if (!user) {
+      // Se não estiver autenticado, redireciona para login com informações do laboratório
+      navigate('/login', { 
+        state: { 
+          returnTo: '/agendar',
+          labId,
+          cep,
+          endereco 
+        }
+      });
+    } else {
+      // Se estiver autenticado, vai direto para agendamento
+      navigate('/agendar', {
+        state: {
+          labId,
+          cep,
+          endereco
+        }
+      });
     }
-  }
+  };
 
   return (
     <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-4xl mx-auto">
@@ -199,7 +200,7 @@ export function LabSearch() {
                   </div>
 
                   <button
-                    onClick={() => agendarExame(lab.id)}
+                    onClick={() => handleLabSelection(lab.id)}
                     className="w-full bg-teal-600 text-white py-2 px-4 rounded-md hover:bg-teal-700 transition-colors focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2"
                   >
                     Agendar Exame

@@ -28,7 +28,7 @@ export function Success() {
                 Confirmação de E-mail
               </h1>
               <p className="text-xl text-gray-600 mb-8">
-                Se você chegou aqui através do link de confirmação de e-mail, seu cadastro foi confirmado com sucesso! Você será redirecionado para a página inicial em alguns segundos.
+                Se você chegou aqui através do link de confirmação de e-mail, seu cadastro foi confirmado com sucesso! Você pode utilizar o site a partir de agora.
               </p>
             </>
           ) : (

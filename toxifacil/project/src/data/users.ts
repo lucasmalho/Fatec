@@ -23,6 +23,7 @@ export const users: User[] = [
     password: 'TCCFatec1*',
     name: 'Administrador'
   }
+];
 
 export const examResults: ExamResult[] = [
   {
